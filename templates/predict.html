@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Airbnb predicted</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+    <style>
+        html {
+            font-size: 14px;
+        }
+        @media (min-width: 768px) {
+            html {
+                font-size: 16px;
+            }
+        }
+        .container {
+            max-width: 960px;
+        }
+        .pricing-header {
+            max-width: 700px;
+        }
+        .card-deck .card {
+            min-width: 220px;
+        }
+    </style>
+</head>
+<body>
+<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+    <h5 class="my-0 mr-md-auto font-weight-normal">Airbnb</h5>
+    <nav class="my-2 my-md-0 mr-md-3">
+        <a class="p-2 text-dark" href="{{ url_for('index') }}">Analysis</a>
+        <a class="p-2 text-dark" href="{{ url_for('predict') }}">Predict</a>
+    </nav>
+</div>
+<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+    <h1 class="display-6">Try our model!</h1>
+    <p class="lead">Just input details of a property and we'll calculate it's price on Airbnb and pay-back period.</p>
+</div>
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <form action="{{ url_for('process_form') }}" method="post">
+                <div class="form-row">
+                    <div class="col-12">
+                        <h3 class="mb-5">The property details</h3>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label for="lat">Title for Airbnb</label>
+                        <input type="text" class="form-control" id="title" name="name">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-12 mt-3">
+                        <h5>Position (only NY)</h5>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="lat">Latitude</label>
+                        <input type="text" class="form-control" id="lat" name="latitude">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="long">Longitude</label>
+                        <input type="text" class="form-control" id="long" name="longitude">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="city">City</label>
+                        <input type="text" class="form-control" id="city" name="city">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="metropolitan">Metropolitan</label>
+                        <input type="text" class="form-control" id="metropolitan" name="metropolitan">
+                    </div>
+                </div>
+
+                <div class="form-row mt-3">
+                <div class="col-12">
+                    <p>
+                        <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample" role="button"
+                           aria-expanded="false" aria-controls="collapseExample">
+                            <b>Access amenities options </b>[expert mode]
+                        </a>
+                    </p>
+                    <div class="collapse" id="collapseExample">
+                        <div class="card card-body">
+                            {% for amenity in amenities %}
+                                <div class="form-group">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="{{ amenity }}"
+                                               value="{{ amenity }}" name="{{amenity}}">
+                                        <label class="form-check-label" for="{{ amenity }}">{{ amenity }}</label>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                </div>
+                <div class="form-row mt-5">
+                    <div class="form-group col-md-4">
+                        <label for="bathrooms">Bathrooms</label>
+                        <input type="number" class="form-control" id="bathrooms" name="bathrooms">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="bedrooms">Bedrooms</label>
+                        <input type="number" class="form-control" id="bedrooms" name="bedrooms">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="beds">Beds</label>
+                        <input type="number" class="form-control" id="beds" name="beds">
+                    </div>
+                </div>
+                <div class="form-row mt-3">
+                    <div class="form-group col-md-4">
+                        <label for="property_types">Property types</label>
+                        <select class="form-control" id="property_types" name="property_type">
+                            {% for property_type in property_types %}
+                                <option value = "{{ property_type }}">{{ property_type }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="cancellation_policy">Cancellation policy</label>
+                        <select class="form-control" id="cancellation_policy" name="cancellation_policy">
+                            {% for cancellation_policy_type in cancellation_policy_types %}
+                                <option value = "{{cancellation_policy_type}}">{{ ' '.join(cancellation_policy_type.split('_')).title() }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="bed_types">Bed types</label>
+                        <select class="form-control" id="bed_types" name="bed_type">
+                            {% for bed_type in bed_types %}
+                                <option value = "{{bed_type}}" >{{ bed_type }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row mt-3">
+                    <div class="form-group col-md-4">
+                        <label for="room_type">Room type</label>
+                        <select class="form-control" id="room_type" name="room_type">
+                            {% for room_type in room_types %}
+                                <option value = "{{room_type}}">{{ room_type }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="accommodates">Accommodates</label>
+                        <input type="number" class="form-control " id="accommodates" name="accommodates">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="discount">Discount for weekly purchase (%):</label>
+                        <input type="number" class="form-control " id="discount" name="discount">
+                    </div>
+                </div>
+
+                <div class="form-row mt-3">
+                    <div class="form-group col-12 form-inline">
+                        <label for="price" class ="mr-3">Price of the property:</label>
+                        $<input type="number" class="form-control ml-2" id="price" name="price">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary mt-3">Submit</button>
+            </form>
+        </div>
+    </div>
+    <footer class="pt-4 my-md-5 pt-md-5 border-top">
+        <div class="row">
+            <div class="col-12">
+                Daniil Boiko, Stanislav Chistyakov, Stefan Tionanda, Edward Tansley
+            </div>
+        </div>
+    </footer>
+</div>
+</body>
+</html>
